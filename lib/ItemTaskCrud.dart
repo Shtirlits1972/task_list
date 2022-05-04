@@ -23,15 +23,6 @@ class ItemTaskCrud {
       list.add(item);
     }
 
-    /*
-    ItemTask item1 = ItemTask.create(1, 'First task', false);
-    list.add(item1);
-
-    ItemTask item2 = ItemTask.create(2, 'Second task', false);
-    list.add(item2);
-
-    ItemTask item3 = ItemTask.create(3, 'Third task', true);
-    list.add(item3);  */
     await database.close();
     return list;
   }
@@ -57,6 +48,16 @@ class ItemTaskCrud {
     }
 */
     //   print('inserted1: $id1');
+  }
+
+  del(int id) async {
+    var databasesPath = await getDatabasesPath();
+    String path = join(databasesPath, 'data.db');
+    Database database = await openDatabase(path, version: 1);
+
+    await database.transaction((txn) async {
+      id = await txn.rawDelete('DELETE FROM [tasks] WHERE id = ?;', [id]);
+    });
   }
 
   edit(int id, String TextTask, bool IsExec) async {

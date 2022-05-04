@@ -28,6 +28,11 @@ class RepoData with ChangeNotifier, DiagnosticableTreeMixin {
     notifyListeners();
   }
 
+  void delTask(int id) {
+    _list.removeWhere((element) => element.id == id);
+    notifyListeners();
+  }
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
