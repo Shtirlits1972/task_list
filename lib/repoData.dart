@@ -4,11 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:task_list/ItemTask.dart';
+import 'package:task_list/flavor.dart';
 
 class RepoData with ChangeNotifier, DiagnosticableTreeMixin {
   // Provider.of<RepoData>(context, listen: false);
   bool _visible = false;
   List<ItemTask> _list = [];
+  List<Flavor> _listFlavor = [];
+
+  List<Flavor> get getFlavors => _listFlavor;
+
+  void addFlavor(Flavor flavor) {
+    _listFlavor.add(flavor);
+    notifyListeners();
+  }
 
   bool get getVisible => _visible;
   List<ItemTask> get getTaskList => _list;

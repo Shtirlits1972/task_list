@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_list/ItemTask.dart';
+import 'package:task_list/flavor.dart';
+import 'package:task_list/list_page.dart';
 import 'package:task_list/repoData.dart';
 
 import 'ItemTaskCrud.dart';
@@ -18,68 +20,47 @@ class _CenterListWidgetState extends State<CenterListWidget> {
   @override
   Widget build(BuildContext context) {
     TextEditingController controller = TextEditingController();
-    return Column(
-      children: [
-        Expanded(
-          flex: 1,
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-            const Expanded(
-              flex: 8,
-              child: Text('Tasks',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black)),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Card(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    const Expanded(
+                      child: Text('Tasks',
+                          //  textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.w600,
+                          )),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        context.read<RepoData>().setVisible(true);
+                      },
+                      icon: const Icon(Icons.add),
+                    ),
+                  ]),
             ),
+            VisibleWidget(controller: controller),
             Expanded(
-              flex: 1,
-              child: IconButton(
-                onPressed: () {
-                  context.read<RepoData>().setVisible(true);
-                },
-                icon: const Icon(Icons.add),
-              ),
-            )
-          ]),
-        ),
-        Expanded(
-          child: Visibility(
-            replacement: const SizedBox.shrink(),
-            //  maintainSize: false,
-            // maintainAnimation: true,
-            visible: context.watch<RepoData>().getVisible,
-            child: TextField(
-              controller: controller,
-              onEditingComplete: () async {
-                ItemTaskCrud crud = ItemTaskCrud();
-                int id = await crud.add(controller.text);
-                ItemTask itemTask = ItemTask.create(id, controller.text, false);
-                context.read<RepoData>().addTask(itemTask);
-                context.read<RepoData>().setVisible(false);
-              },
-              decoration: const InputDecoration(
-                hintText: 'Enter text of task',
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.redAccent, width: 3)),
+              child: Container(
+                child: Center(
+                  child: ListPage(),
+
+                  /*
+                   ListView(
+                    children: _buildList(),
+                  ),  */
+                ),
               ),
             ),
-          ),
-          flex: 1,
+          ],
         ),
-        Expanded(
-          flex: 10,
-          child: Container(
-            color: Colors.white,
-            child: Center(
-              child: ListView(
-                children: _buildList(),
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 //   MediaQuery.of(context).size.width
@@ -180,5 +161,47 @@ class _CenterListWidgetState extends State<CenterListWidget> {
 
     super.initState();
     _loadItemTasks();
+  }
+}
+
+class VisibleWidget extends StatelessWidget {
+  const VisibleWidget({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Visibility(
+      replacement: const SizedBox.shrink(),
+      // maintainSize: false,
+      // maintainAnimation: true,
+      visible: context.watch<RepoData>().getVisible,
+      child: TextField(
+        enabled: true,
+        autofocus: true,
+        controller: controller,
+        onEditingComplete: () async {
+          Flavor flavor = Flavor(name: controller.text);
+          context.read<RepoData>().addFlavor(flavor);
+          context.read<RepoData>().setVisible(false);
+          controller.text = '';
+          /*
+          ItemTaskCrud crud = ItemTaskCrud();
+          int id = await crud.add(controller.text);
+          ItemTask itemTask = ItemTask.create(id, controller.text, false);
+          context.read<RepoData>().addTask(itemTask);
+           */
+        },
+        decoration: const InputDecoration(
+          hintText: 'Enter text of task',
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              borderSide: BorderSide(color: Colors.blueAccent, width: 1.0)),
+        ),
+      ),
+    );
   }
 }
